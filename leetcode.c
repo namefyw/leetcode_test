@@ -180,6 +180,128 @@ long long sellingWood(int m, int n, int** prices, int pricesSize, int* pricesCol
 }
 #endif
 #endif
+#if (leetcode_2007)
+#if 0
+typedef struct {
+    int key;
+    int val;
+    UT_hash_handle hh;
+} HashItem;
+
+HashItem *hashFindItem(HashItem **obj, int key) {
+    HashItem *pEntry = NULL;
+    HASH_FIND_INT(*obj, &key, pEntry);
+    return pEntry;
+}
+
+bool hashAddItem(HashItem **obj, int key, int val) {
+    if (hashFindItem(obj, key)) {
+        return false;
+    }
+    HashItem *pEntry = (HashItem *)malloc(sizeof(HashItem));
+    pEntry->key = key;
+    pEntry->val = val;
+    HASH_ADD_INT(*obj, key, pEntry);
+    return true;
+}
+
+bool hashSetItem(HashItem **obj, int key, int val) {
+    HashItem *pEntry = hashFindItem(obj, key);
+    if (!pEntry) {
+        hashAddItem(obj, key, val);
+    } else {
+        pEntry->val = val;
+    }
+    return true;
+}
+
+int hashGetItem(HashItem **obj, int key, int defaultVal) {
+    HashItem *pEntry = hashFindItem(obj, key);
+    if (!pEntry) {
+        return defaultVal;
+    }
+    return pEntry->val;
+}
+
+void hashFree(HashItem **obj) {
+    HashItem *curr = NULL, *tmp = NULL;
+    HASH_ITER(hh, *obj, curr, tmp) {
+        HASH_DEL(*obj, curr);
+        free(curr);
+    }
+}
+
+static int cmp(const void *a, const void *b) {
+    return *(int *)a - *(int *)b;
+}
+
+int* findOriginalArray(int* changed, int changedSize, int* returnSize) {
+    qsort(changed, changedSize, sizeof(int), cmp);
+    HashItem *count = NULL;
+    for (int i = 0; i < changedSize; i++) {
+        int a = changed[i];
+        hashSetItem(&count, a, hashGetItem(&count, a, 0) + 1);
+    }
+
+    int *res = (int *)malloc(sizeof(int) * changedSize);
+    int pos = 0;
+    for (int i = 0; i < changedSize; i++) {
+        int a = changed[i];
+        if (hashGetItem(&count, a, 0) == 0) {
+            continue;
+        }
+        hashSetItem(&count, a, hashGetItem(&count, a, 0) - 1);
+        if (hashGetItem(&count, 2 * a, 0) == 0) {
+            hashFree(&count);
+            *returnSize = 0;
+            return NULL;
+        }
+        hashSetItem(&count, a * 2, hashGetItem(&count, a * 2, 0) - 1);
+        res[pos++] = a;
+    }
+    *returnSize = pos;
+    hashFree(&count);
+    return res;
+}
+#else
+int cmp(const void* a, const void* b) {
+    return *(int*) a - *(int*) b;
+}
+
+int* findOriginalArray(int* changed, int changedSize, int* returnSize) {
+    qsort(changed, changedSize, sizeof(int), cmp); //排序的函数
+    int* ans = malloc(changedSize / 2 * sizeof(int));
+    int ans_idx = 0;
+    int* q = malloc(changedSize / 2 * sizeof(int));
+    int front = 0, rear = 0;
+    for (int i = 0; i < changedSize; ++i) {
+        int x = changed[i];
+        if (front < rear) {
+            if (q[front] < x) { // 无法配对
+                free(ans);
+                free(q);
+                *returnSize = 0;
+                return NULL;
+            }
+            if (q[front] == x) { // 配对成功
+                ++front; // 清除一个标记
+                continue;
+            }
+        }
+        if (ans_idx == changedSize / 2) {
+            free(ans);
+            free(q);
+            *returnSize = 0;
+            return NULL;
+        }
+        ans[ans_idx++] = x;
+        q[rear++] = x * 2; // 添加双倍标记
+    }
+    *returnSize = ans_idx;
+    return ans;
+}
+#endif
+#endif
 #if (leetcode_2642)
 #if 1
 /* 官方题解 */
@@ -596,3 +718,4 @@ void frequencyTrackerFree(FrequencyTracker* obj) {
 }
 #endif
 #endif
+
