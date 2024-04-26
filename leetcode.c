@@ -65,6 +65,104 @@ struct ListNode* mergeTwoLists(struct ListNode* list1, struct ListNode* list2) {
 #endif
 #endif
 
+#if leetcode_26
+int removeDuplicates(int* nums, int numsSize) {
+    if (numsSize == 0) return 0;
+    int newlen = 1;
+    int index = 1;
+    for (int i = 0; i < numsSize - 1; i++) {
+        if (nums[i] != nums[i+1]) {
+            newlen++;
+            nums[index++] = nums[i+1];
+        }
+    }
+    return newlen;
+}
+#endif
+
+#if leetcode_27
+int removeElement(int* nums, int numsSize, int val) {
+    if (nums == NULL || numsSize == 0) return 0;
+    int newlen = numsSize;
+    int index = 0;
+    for (int i = 0; i < numsSize; i++) {
+        if (nums[i] != val) {
+            nums[index] = nums[i];
+            index++;
+        } else {
+            newlen--;
+        }
+    }
+    return newlen;
+}
+#endif
+
+#if leetcode_28
+int strStr(char* haystack, char* needle) {
+    int len1 = strlen(haystack);
+    int len2 = strlen(needle);
+    bool flag;
+    if (len1 < len2) return -1;
+    for (int i = 0; i <= len1 - len2; i++) {
+        flag = true;
+        for (int j = 0; j < len2; j++) {
+            if (haystack[i+j] != needle[j]) {
+                flag = false;
+                break;
+            }
+        }
+        if (flag) {
+            return i;
+        }
+    }
+    return -1;
+}
+#endif
+
+#if leetcode_35
+int searchInsert(int* nums, int numsSize, int target) {
+    int index;
+    for (index = 0; index < numsSize; index++) {
+        if(target <= nums[index]) {
+            break;
+        }
+    }
+    return index;
+}
+#endif
+
+#if leetcode_58
+#if 0 // 正向巡查
+int lengthOfLastWord(char* s) {
+    int len = strlen(s);
+    int ret = 0;
+    for (int i = 0; i < len; i++) {
+        if (s[i] == ' ' && s[i+1] != ' ') {
+            if ((i+1) != len) ret = 0;
+        } else if (s[i] != ' ') {
+            ret++;
+        }
+    }
+    return ret;
+}
+#else // 反向巡查
+int lengthOfLastWord(char* s) {
+    if (s == NULL) return 0;
+    int len = strlen(s) - 1;
+    int ret = 0;
+
+    while(len >= 0) {
+        if ((ret != 0) && (s[len] == ' ')) return ret;
+        if (s[len] != ' ') {
+            ret++;
+        }
+        len--;
+    }
+    return ret;
+}
+#endif
+#endif
+
 #if leetcode_219
 typedef struct record{
   int data;
